@@ -1,5 +1,10 @@
 streamlit
 boto3
-fpdf2
+fpdf2==2.8.9
 diagrams
 graphviz
+
+# NOTE: do not install the legacy "fpdf" package alongside "fpdf2".
+# Both packages install into the same importable "fpdf" folder; having
+# both present can corrupt the installed files (e.g. missing __init__.py,
+# missing FPDF.epw) depending on install/uninstall order.
