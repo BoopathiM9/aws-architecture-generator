@@ -28,7 +28,7 @@ An AI-powered tool built with **Python**, **Streamlit**, **AWS Boto3**, **Diagra
 ### 2. Installation & Setup
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/aws-architecture-generator.git
+git clone https://github.com/BoopathiM9/aws-architecture-generator.git
 cd aws-architecture-generator
 
 # Install Dependencies
