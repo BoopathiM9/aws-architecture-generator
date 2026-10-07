@@ -1,0 +1,8 @@
+# Copy this file to terraform.tfvars and fill in your values
+# NEVER commit terraform.tfvars to git — it contains secrets
+
+aws_region            = "ap-south-1"
+domain_name           = "architecture-generator.in"
+ec2_key_pair_name     = "your-keypair-name"        # Must exist in ap-south-1
+aws_access_key_id     = "AKIAXXXXXXXXXXXXXXXX"
+aws_secret_access_key = "your-secret-key-here"

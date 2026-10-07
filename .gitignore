@@ -4,3 +4,10 @@ __pycache__/
 *.png
 *.pdf
 .vscode/
+
+# Terraform — never commit state or secrets
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/terraform.tfvars
