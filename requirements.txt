@@ -1,0 +1,5 @@
+streamlit
+boto3
+fpdf2
+diagrams
+graphviz
