@@ -406,10 +406,20 @@ def generate_diagram(services_found, filename="aws_architecture"):
 # Helper Function: Generate Documentation via AWS Bedrock or Smart Engine
 def generate_documentation_bedrock(prompt, model_id, region):
     try:
-        # Uses boto3's default credential chain: AWS CLI profile (~/.aws/credentials),
-        # environment variables (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY), or an
-        # attached IAM role. No credentials are collected from the UI.
-        client = boto3.client("bedrock-runtime", region_name=region)
+        # Credential resolution order:
+        # 1. Streamlit Cloud secrets (st.secrets["aws"]) — used when deployed on Streamlit Cloud
+        # 2. boto3 default chain: env vars, ~/.aws/credentials, IAM role — used locally
+        kwargs = {"region_name": region}
+        try:
+            secrets = st.secrets.get("aws", {})
+            if secrets.get("AWS_ACCESS_KEY_ID") and secrets.get("AWS_SECRET_ACCESS_KEY"):
+                kwargs["aws_access_key_id"]     = secrets["AWS_ACCESS_KEY_ID"]
+                kwargs["aws_secret_access_key"] = secrets["AWS_SECRET_ACCESS_KEY"]
+                if secrets.get("AWS_DEFAULT_REGION"):
+                    kwargs["region_name"] = secrets["AWS_DEFAULT_REGION"]
+        except Exception:
+            pass  # st.secrets not available locally — fall back to boto3 default chain
+        client = boto3.client("bedrock-runtime", **kwargs)
         
         system_prompt = """You are a Senior AWS Principal Solutions Architect.
 
@@ -968,7 +978,17 @@ def generate_mermaid_bedrock(prompt, model_id, region):
         f"Requirement:\n{prompt}"
     )
     try:
-        client = boto3.client("bedrock-runtime", region_name=region)
+        kwargs = {"region_name": region}
+        try:
+            secrets = st.secrets.get("aws", {})
+            if secrets.get("AWS_ACCESS_KEY_ID") and secrets.get("AWS_SECRET_ACCESS_KEY"):
+                kwargs["aws_access_key_id"]     = secrets["AWS_ACCESS_KEY_ID"]
+                kwargs["aws_secret_access_key"] = secrets["AWS_SECRET_ACCESS_KEY"]
+                if secrets.get("AWS_DEFAULT_REGION"):
+                    kwargs["region_name"] = secrets["AWS_DEFAULT_REGION"]
+        except Exception:
+            pass
+        client = boto3.client("bedrock-runtime", **kwargs)
         if "claude" in model_id:
             payload = {
                 "anthropic_version": "bedrock-2023-05-31",
