@@ -217,11 +217,13 @@ resource "aws_acm_certificate" "cert" {
 }
 
 # =============================================================================
-# ROUTE 53 — Hosted Zone + DNS validation + A record
+# ROUTE 53 — Create Hosted Zone (works even before domain is registered)
+# After terraform apply, copy the NS records shown in the output to your
+# domain registrar (or Route 53 Registered Domains) to point DNS here.
 # =============================================================================
-data "aws_route53_zone" "main" {
-  name         = var.domain_name
-  private_zone = false
+resource "aws_route53_zone" "main" {
+  name = var.domain_name
+  tags = { Name = "${var.app_name}-zone" }
 }
 
 resource "aws_route53_record" "cert_validation" {
@@ -232,7 +234,7 @@ resource "aws_route53_record" "cert_validation" {
       type   = dvo.resource_record_type
     }
   }
-  zone_id = data.aws_route53_zone.main.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
@@ -247,7 +249,7 @@ resource "aws_acm_certificate_validation" "cert" {
 
 # A record pointing domain → CloudFront
 resource "aws_route53_record" "app" {
-  zone_id = data.aws_route53_zone.main.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = var.domain_name
   type    = "A"
   alias {
@@ -258,7 +260,7 @@ resource "aws_route53_record" "app" {
 }
 
 resource "aws_route53_record" "www" {
-  zone_id = data.aws_route53_zone.main.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = "www.${var.domain_name}"
   type    = "A"
   alias {
@@ -337,4 +339,9 @@ output "app_url" {
 output "ec2_public_ip" {
   value       = aws_eip.app.public_ip
   description = "EC2 Elastic IP — use for SSH: ssh -i your-key.pem ec2-user@<ip>"
+}
+
+output "route53_nameservers" {
+  value       = aws_route53_zone.main.name_servers
+  description = "Point these NS records at your domain registrar to activate the domain"
 }
