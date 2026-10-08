@@ -5,9 +5,7 @@ services:
     buildCommand: apt-get install -y graphviz && pip install -r requirements.txt
     startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
     envVars:
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
+      - key: DEFAULT_ENGINE
+        value: smart
       - key: AWS_DEFAULT_REGION
         value: us-east-1

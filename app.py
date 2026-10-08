@@ -198,9 +198,13 @@ with st.sidebar:
 
     st.divider()
     st.subheader("AI Engine")
+    # On Render (no AWS credentials available), default to Smart Engine automatically.
+    # Locally with AWS CLI configured, defaults to Bedrock.
+    _default_engine_idx = 1 if os.environ.get("DEFAULT_ENGINE") == "smart" else 0
     ai_engine = st.selectbox(
         "Select Provider",
-        ["AWS Bedrock (Claude / Nova via Boto3)", "Smart AWS Architect Engine (Local / Zero Setup)"]
+        ["AWS Bedrock (Claude / Nova via Boto3)", "Smart AWS Architect Engine (Local / Zero Setup)"],
+        index=_default_engine_idx
     )
 
     bedrock_model = "amazon.nova-lite-v1:0"
